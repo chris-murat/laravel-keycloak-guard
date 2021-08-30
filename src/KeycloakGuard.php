@@ -16,15 +16,32 @@ class KeycloakGuard implements Guard
   private $provider;
   private $decodedToken;
 
-  public function __construct(UserProvider $provider, Request $request)
+  public function __construct(UserProvider $provider, Request $request, ?string $realmName)
   {
-    $this->config = config('keycloak');
+    $this->config = $this->configurationForRealm($realmName);
     $this->user = null;
     $this->provider = $provider;
     $this->decodedToken = null;
     $this->request = $request;
 
     $this->authenticate();
+  }
+
+  /**
+   * Return the proper configuration from the provided realmName, the default configuration will be returned if omitted
+   * 
+   *
+   * @param string|null $realmName
+   * @return void
+   */
+  protected function configurationForRealm(?string $realmName): array
+  {
+    if(empty($realmName)) {
+      $realmName = config("keycloak.default_realm");
+    }
+
+    // preserve default behavior, (aka. configuration is set in the root level)
+    return empty($config = config("keycloak.realms.$realmName")) ? config("keycloak") : $config;
   }
 
   /**

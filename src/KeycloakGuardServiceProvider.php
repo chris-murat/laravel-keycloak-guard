@@ -18,7 +18,7 @@ class KeycloakGuardServiceProvider extends ServiceProvider
   public function register()
   {
     Auth::extend('keycloak', function ($app, $name, array $config) {
-      return new KeycloakGuard(Auth::createUserProvider($config['provider']), $app->request);
+      return new KeycloakGuard(Auth::createUserProvider($config['provider']), $app->request, $config['realm'] ?? "");
     });
   }
 }
